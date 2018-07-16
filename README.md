@@ -1,5 +1,7 @@
 # Sortable Tables
 
+## NOTE: This is a fork of evancz/elm-sortable-table. The original package does not seem to be maintained anymore.
+
 Create sortable tables for data of any shape.
 
 This library also lets you customize `<caption>`, `<tbody>`, `<tr>`, etc. for your particular needs. So it is pretty easy to do whatever crazy CSS trickery is needed to get the exact table you want.
