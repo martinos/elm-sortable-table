@@ -65,7 +65,7 @@ is not that crazy.
 
 ## Custom Tables
 
-@docs Config, customConfig, uiDef, HtmlDetails, ColumnSortingStatus, defaultUIDef
+@docs Config, customConfig, UIDef, HtmlDetails, ColumnSortingStatus, defaultUIDef
 
 -}
 
