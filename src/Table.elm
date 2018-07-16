@@ -60,15 +60,12 @@ is not that crazy.
 
 ## Custom Columns
 
-@docs Column, customColumn, veryCustomColumn,
-Sorter, unsortable, increasingBy, decreasingBy,
-increasingOrDecreasingBy, decreasingOrIncreasingBy
+@docs Column, customColumn, veryCustomColumn, Sorter, unsortable, increasingBy, decreasingBy, increasingOrDecreasingBy, decreasingOrIncreasingBy
 
 
 ## Custom Tables
 
-@docs Config, customConfig, Customizations, HtmlDetails, Status,
-defaultCustomizations
+@docs Config, customConfig, Customizations, HtmlDetails, Status, defaultCustomizations
 
 -}
 
@@ -246,7 +243,7 @@ defaultCustomizations =
 
 simpleThead : List ( String, Status, Attribute msg ) -> HtmlDetails msg
 simpleThead headers =
-    HtmlDetails [] [ tr [] (List.map simpleTheadHelp headers) ]
+    HtmlDetails [] [ Html.tr [] (List.map simpleTheadHelp headers) ]
 
 
 simpleTheadHelp : ( String, Status, Attribute msg ) -> Html msg
