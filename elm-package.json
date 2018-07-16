@@ -1,6 +1,6 @@
 {
-    "version": "1.0.1",
-    "summary": "Sortable tables for data of any shape. Forked from the evancz/elm-sortable-table project",
+    "version": "1.0.11",
+    "summary": "Sortable tables for data of any shape. Forked from evancz/elm-sortable-table",
     "repository": "https://github.com/martinos/elm-sortable-table.git",
     "license": "BSD3",
     "source-directories": [
