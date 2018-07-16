@@ -89,6 +89,11 @@ type State
     = State String Bool
 
 
+type SelectionState
+    = Selected
+    | NotSelected
+
+
 {-| Create a table state. By providing a column name, you determine which
 column should be used for sorting by default. So if you want your table of
 yachts to be sorted by length by default, you might say:
@@ -247,12 +252,14 @@ simpleTheadHelp ( name, status, onClick ) =
                 Unsortable ->
                     [ Html.text name ]
 
-                Sortable selected ->
+                Sortable selection ->
                     [ Html.text name
-                    , if selected then
-                        darkGrey "↓"
-                      else
-                        lightGrey "↓"
+                    , case selection of
+                        Selected ->
+                            darkGrey "↓"
+
+                        NotSelected ->
+                            lightGrey "↓"
                     ]
 
                 Reversible Nothing ->
@@ -306,7 +313,7 @@ This information lets you do custom header decorations for each scenario.
 -}
 type Status
     = Unsortable
-    | Sortable Bool
+    | Sortable SelectionState
     | Reversible (Maybe Bool)
 
 
@@ -489,10 +496,10 @@ toHeaderInfo (State sortName isReversed) toMsg { name, sorter } =
             ( name, Unsortable, onClick sortName isReversed toMsg )
 
         Increasing _ ->
-            ( name, Sortable (name == sortName), onClick name False toMsg )
+            ( name, Sortable (checkSelection name sortName), onClick name False toMsg )
 
         Decreasing _ ->
-            ( name, Sortable (name == sortName), onClick name False toMsg )
+            ( name, Sortable (checkSelection name sortName), onClick name False toMsg )
 
         IncOrDec _ ->
             if name == sortName then
@@ -505,6 +512,14 @@ toHeaderInfo (State sortName isReversed) toMsg { name, sorter } =
                 ( name, Reversible (Just isReversed), onClick name (not isReversed) toMsg )
             else
                 ( name, Reversible Nothing, onClick name False toMsg )
+
+
+checkSelection : String -> String -> SelectionState
+checkSelection name sortName =
+    if name == sortName then
+        Selected
+    else
+        NotSelected
 
 
 onClick : String -> Bool -> (State -> msg) -> Attribute msg
