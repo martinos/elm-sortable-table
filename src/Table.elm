@@ -246,7 +246,7 @@ defaultCustomizations =
 
 simpleThead : List ( String, Status, Attribute msg ) -> HtmlDetails msg
 simpleThead headers =
-    HtmlDetails [] (List.map simpleTheadHelp headers)
+    HtmlDetails [] [ tr [] (List.map simpleTheadHelp headers) ]
 
 
 simpleTheadHelp : ( String, Status, Attribute msg ) -> Html msg
