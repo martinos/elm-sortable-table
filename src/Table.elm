@@ -86,7 +86,12 @@ import Json.Decode as Json
 {-| Tracks which column to sort by.
 -}
 type State
-    = State String Bool
+    = State String Direction
+
+
+type Direction
+    = Normal
+    | Reversed
 
 
 type SelectionState
@@ -105,7 +110,7 @@ yachts to be sorted by length by default, you might say:
 -}
 initialSort : String -> State
 initialSort header =
-    State header False
+    State header Normal
 
 
 
@@ -267,13 +272,15 @@ simpleTheadHelp ( name, status, onClick ) =
                     , lightGrey "↕"
                     ]
 
-                Reversible (Just isReversed) ->
+                Reversible (Just direction) ->
                     [ Html.text name
                     , darkGrey
-                        (if isReversed then
-                            "↑"
-                         else
-                            "↓"
+                        (case direction of
+                            Reversed ->
+                                "↑"
+
+                            Normal ->
+                                "↓"
                         )
                     ]
     in
@@ -300,12 +307,10 @@ simpleRowAttrs _ =
 
   - If the column is unsortable, the status will always be `Unsortable`.
   - If the column can be sorted in one direction, the status will be `Sortable`.
-    The associated boolean represents whether this column is selected. So it is
-    `True` if the table is currently sorted by this column, and `False` otherwise.
   - If the column can be sorted in either direction, the status will be `Reversible`.
     The associated maybe tells you whether this column is selected. It is
-    `Just isReversed` if the table is currently sorted by this column, and
-    `Nothing` otherwise. The `isReversed` boolean lets you know which way it
+    `Just direction` if the table is currently sorted by this column, and
+    `Nothing` otherwise. Direction type lets you know which way it
     is sorted.
 
 This information lets you do custom header decorations for each scenario.
@@ -314,7 +319,7 @@ This information lets you do custom header decorations for each scenario.
 type Status
     = Unsortable
     | Sortable SelectionState
-    | Reversible (Maybe Bool)
+    | Reversible (Maybe Direction)
 
 
 
@@ -490,28 +495,38 @@ view (Config { toId, toMsg, columns, customizations }) state data =
 
 
 toHeaderInfo : State -> (State -> msg) -> ColumnData data msg -> ( String, Status, Attribute msg )
-toHeaderInfo (State sortName isReversed) toMsg { name, sorter } =
+toHeaderInfo (State sortName direction) toMsg { name, sorter } =
     case sorter of
         None ->
-            ( name, Unsortable, onClick sortName isReversed toMsg )
+            ( name, Unsortable, onClick sortName direction toMsg )
 
         Increasing _ ->
-            ( name, Sortable (checkSelection name sortName), onClick name False toMsg )
+            ( name, Sortable (checkSelection name sortName), onClick name Normal toMsg )
 
         Decreasing _ ->
-            ( name, Sortable (checkSelection name sortName), onClick name False toMsg )
+            ( name, Sortable (checkSelection name sortName), onClick name Normal toMsg )
 
         IncOrDec _ ->
             if name == sortName then
-                ( name, Reversible (Just isReversed), onClick name (not isReversed) toMsg )
+                ( name, Reversible (Just direction), onClick name (toggleDirection direction) toMsg )
             else
-                ( name, Reversible Nothing, onClick name False toMsg )
+                ( name, Reversible Nothing, onClick name Normal toMsg )
 
         DecOrInc _ ->
             if name == sortName then
-                ( name, Reversible (Just isReversed), onClick name (not isReversed) toMsg )
+                ( name, Reversible (Just direction), onClick name (toggleDirection direction) toMsg )
             else
-                ( name, Reversible Nothing, onClick name False toMsg )
+                ( name, Reversible Nothing, onClick name Normal toMsg )
+
+
+toggleDirection : Direction -> Direction
+toggleDirection direction =
+    case direction of
+        Normal ->
+            Reversed
+
+        Reversed ->
+            Normal
 
 
 checkSelection : String -> String -> SelectionState
@@ -522,11 +537,11 @@ checkSelection name sortName =
         NotSelected
 
 
-onClick : String -> Bool -> (State -> msg) -> Attribute msg
-onClick name isReversed toMsg =
+onClick : String -> Direction -> (State -> msg) -> Attribute msg
+onClick name direction toMsg =
     E.on "click" <|
         Json.map toMsg <|
-            Json.map2 State (Json.succeed name) (Json.succeed isReversed)
+            Json.map2 State (Json.succeed name) (Json.succeed direction)
 
 
 viewRow : (data -> String) -> List (ColumnData data msg) -> (data -> List (Attribute msg)) -> data -> ( String, Html msg )
@@ -555,17 +570,17 @@ viewCell data { viewData } =
 
 
 sort : State -> List (ColumnData data msg) -> List data -> List data
-sort (State selectedColumn isReversed) columnData data =
+sort (State selectedColumn direction) columnData data =
     case findSorter selectedColumn columnData of
         Nothing ->
             data
 
         Just sorter ->
-            applySorter isReversed sorter data
+            applySorter direction sorter data
 
 
-applySorter : Bool -> Sorter data -> List data -> List data
-applySorter isReversed sorter data =
+applySorter : Direction -> Sorter data -> List data -> List data
+applySorter direction sorter data =
     case sorter of
         None ->
             data
@@ -577,16 +592,20 @@ applySorter isReversed sorter data =
             List.reverse (sort data)
 
         IncOrDec sort ->
-            if isReversed then
-                List.reverse (sort data)
-            else
-                sort data
+            case direction of
+                Reversed ->
+                    List.reverse (sort data)
+
+                Normal ->
+                    sort data
 
         DecOrInc sort ->
-            if isReversed then
-                sort data
-            else
-                List.reverse (sort data)
+            case direction of
+                Reversed ->
+                    sort data
+
+                Normal ->
+                    List.reverse (sort data)
 
 
 findSorter : String -> List (ColumnData data msg) -> Maybe (Sorter data)
