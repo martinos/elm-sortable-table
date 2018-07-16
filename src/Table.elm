@@ -124,7 +124,7 @@ type Config data msg
     = Config
         { toId : data -> String
         , toMsg : State -> msg
-        , columns : List (ColumnData data msg)
+        , columns : List (ColumnDefn data msg)
         , customizations : Customizations data msg
         }
 
@@ -326,10 +326,10 @@ type Status
 {-| Describes how to turn `data` into a column in your table.
 -}
 type Column data msg
-    = Column (ColumnData data msg)
+    = Column (ColumnDefn data msg)
 
 
-type alias ColumnData data msg =
+type alias ColumnDefn data msg =
     { name : String
     , viewData : data -> HtmlDetails msg
     , sorter : Sorter data
@@ -404,7 +404,7 @@ customColumn :
     -> Column data msg
 customColumn { name, viewData, sorter } =
     Column <|
-        ColumnData name (textDetails << viewData) sorter
+        ColumnDefn name (textDetails << viewData) sorter
 
 
 {-| It is *possible* that you want something crazier than `customColumn`. In
@@ -433,12 +433,7 @@ So maybe you want to a dollars column, and the dollar signs should be green.
             ]
 
 -}
-veryCustomColumn :
-    { name : String
-    , viewData : data -> HtmlDetails msg
-    , sorter : Sorter data
-    }
-    -> Column data msg
+veryCustomColumn : ColumnDefn data msg -> Column data msg
 veryCustomColumn =
     Column
 
@@ -491,7 +486,7 @@ view (Config { toId, toMsg, columns, customizations }) state data =
                     Html.caption attributes children :: thead :: withFoot
 
 
-toHeaderInfo : State -> (State -> msg) -> ColumnData data msg -> ( String, Status, Attribute msg )
+toHeaderInfo : State -> (State -> msg) -> ColumnDefn data msg -> ( String, Status, Attribute msg )
 toHeaderInfo (State sortName direction) toMsg { name, sorter } =
     case sorter of
         None ->
@@ -541,19 +536,19 @@ onClick name direction toMsg =
             Json.map2 State (Json.succeed name) (Json.succeed direction)
 
 
-viewRow : (data -> String) -> List (ColumnData data msg) -> (data -> List (Attribute msg)) -> data -> ( String, Html msg )
+viewRow : (data -> String) -> List (ColumnDefn data msg) -> (data -> List (Attribute msg)) -> data -> ( String, Html msg )
 viewRow toId columns toRowAttrs data =
     ( toId data
     , lazy3 viewRowHelp columns toRowAttrs data
     )
 
 
-viewRowHelp : List (ColumnData data msg) -> (data -> List (Attribute msg)) -> data -> Html msg
+viewRowHelp : List (ColumnDefn data msg) -> (data -> List (Attribute msg)) -> data -> Html msg
 viewRowHelp columns toRowAttrs data =
     Html.tr (toRowAttrs data) (List.map (viewCell data) columns)
 
 
-viewCell : data -> ColumnData data msg -> Html msg
+viewCell : data -> ColumnDefn data msg -> Html msg
 viewCell data { viewData } =
     let
         details =
@@ -566,9 +561,9 @@ viewCell data { viewData } =
 -- SORTING
 
 
-sort : State -> List (ColumnData data msg) -> List data -> List data
-sort (State selectedColumn direction) columnData data =
-    case findSorter selectedColumn columnData of
+sort : State -> List (ColumnDefn data msg) -> List data -> List data
+sort (State selectedColumn direction) columnDefn data =
+    case findSorter selectedColumn columnDefn of
         Nothing ->
             data
 
@@ -605,9 +600,9 @@ applySorter direction sorter data =
                     List.reverse (sort data)
 
 
-findSorter : String -> List (ColumnData data msg) -> Maybe (Sorter data)
-findSorter selectedColumn columnData =
-    case columnData of
+findSorter : String -> List (ColumnDefn data msg) -> Maybe (Sorter data)
+findSorter selectedColumn columnDefn =
+    case columnDefn of
         [] ->
             Nothing
 
