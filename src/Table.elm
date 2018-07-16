@@ -18,10 +18,10 @@ module Table
         , decreasingOrIncreasingBy
         , Config
         , customConfig
-        , Customizations
+        , UIDef
         , HtmlDetails
-        , Status(..)
-        , defaultCustomizations
+        , ColumnSortingStatus(..)
+        , defaultUIDef
         )
 
 {-| This library helps you create sortable tables. The crucial feature is that it
@@ -65,7 +65,7 @@ is not that crazy.
 
 ## Custom Tables
 
-@docs Config, customConfig, Customizations, HtmlDetails, Status, defaultCustomizations
+@docs Config, customConfig, uiDef, HtmlDetails, ColumnSortingStatus, defaultUIDef
 
 -}
 
@@ -125,7 +125,7 @@ type Config data msg
         { toId : data -> String
         , toMsg : State -> msg
         , columns : List (ColumnDefn data msg)
-        , customizations : Customizations data msg
+        , uiDef : UIDef data msg
         }
 
 
@@ -164,35 +164,32 @@ See the [examples] to get a better feel for this!
 
 -}
 config :
-    { toId : data -> String
-    , toMsg : State -> msg
-    , columns : List (Column data msg)
-    }
+    { toId : data -> String, toMsg : State -> msg, columns : List (Column data msg) }
     -> Config data msg
 config { toId, toMsg, columns } =
     Config
         { toId = toId
         , toMsg = toMsg
         , columns = List.map (\(Column cData) -> cData) columns
-        , customizations = defaultCustomizations
+        , uiDef = defaultUIDef
         }
 
 
-{-| Just like `config` but you can specify a bunch of table customizations.
+{-| Just like `config` but you can specify a bunch of table uiDef.
 -}
 customConfig :
     { toId : data -> String
     , toMsg : State -> msg
     , columns : List (Column data msg)
-    , customizations : Customizations data msg
+    , uiDef : UIDef data msg
     }
     -> Config data msg
-customConfig { toId, toMsg, columns, customizations } =
+customConfig { toId, toMsg, columns, uiDef } =
     Config
         { toId = toId
         , toMsg = toMsg
         , columns = List.map (\(Column cData) -> cData) columns
-        , customizations = customizations
+        , uiDef = uiDef
         }
 
 
@@ -208,10 +205,10 @@ impossible to do bad stuff. So just be aware of that, and share any stories
 you have. Stories make it possible to design better!
 
 -}
-type alias Customizations data msg =
+type alias UIDef data msg =
     { tableAttrs : List (Attribute msg)
     , caption : Maybe (HtmlDetails msg)
-    , thead : List ( String, Status, Attribute msg ) -> HtmlDetails msg
+    , thead : List ( String, ColumnSortingStatus, Attribute msg ) -> HtmlDetails msg
     , tfoot : Maybe (HtmlDetails msg)
     , tbodyAttrs : List (Attribute msg)
     , rowAttrs : data -> List (Attribute msg)
@@ -228,10 +225,10 @@ type alias HtmlDetails msg =
     }
 
 
-{-| The customizations used in `config` by default.
+{-| The uiDef used in `config` by default.
 -}
-defaultCustomizations : Customizations data msg
-defaultCustomizations =
+defaultUIDef : UIDef data msg
+defaultUIDef =
     { tableAttrs = []
     , caption = Nothing
     , thead = simpleThead
@@ -241,12 +238,12 @@ defaultCustomizations =
     }
 
 
-simpleThead : List ( String, Status, Attribute msg ) -> HtmlDetails msg
+simpleThead : List ( String, ColumnSortingStatus, Attribute msg ) -> HtmlDetails msg
 simpleThead headers =
     HtmlDetails [] [ Html.tr [] (List.map simpleTheadHelp headers) ]
 
 
-simpleTheadHelp : ( String, Status, Attribute msg ) -> Html msg
+simpleTheadHelp : ( String, ColumnSortingStatus, Attribute msg ) -> Html msg
 simpleTheadHelp ( name, status, onClick ) =
     let
         content =
@@ -300,7 +297,7 @@ simpleRowAttrs _ =
 
 
 {-| The status of a particular column, for use in the `thead` field of your
-`Customizations`.
+`UIDef`.
 
   - If the column is unsortable, the status will always be `Unsortable`.
   - If the column can be sorted in one direction, the status will be `Sortable`.
@@ -313,7 +310,7 @@ simpleRowAttrs _ =
 This information lets you do custom header decorations for each scenario.
 
 -}
-type Status
+type ColumnSortingStatus
     = Unsortable
     | Sortable SelectionState
     | Reversible (Maybe Direction)
@@ -341,7 +338,7 @@ stringColumn : String -> (data -> String) -> Column data msg
 stringColumn name toStr =
     Column
         { name = name
-        , viewData = textDetails << toStr
+        , viewData = toStr >> textDetails
         , sorter = increasingOrDecreasingBy toStr
         }
 
@@ -351,7 +348,7 @@ intColumn : String -> (data -> Int) -> Column data msg
 intColumn name toInt =
     Column
         { name = name
-        , viewData = textDetails << toString << toInt
+        , viewData = toInt >> toString >> textDetails
         , sorter = increasingOrDecreasingBy toInt
         }
 
@@ -361,7 +358,7 @@ floatColumn : String -> (data -> Float) -> Column data msg
 floatColumn name toFloat =
     Column
         { name = name
-        , viewData = textDetails << toString << toFloat
+        , viewData = toFloat >> toString >> textDetails
         , sorter = increasingOrDecreasingBy toFloat
         }
 
@@ -397,14 +394,10 @@ More about sorters soon!
 
 -}
 customColumn :
-    { name : String
-    , viewData : data -> String
-    , sorter : Sorter data
-    }
+    { name : String, viewData : data -> String, sorter : Sorter data }
     -> Column data msg
 customColumn { name, viewData, sorter } =
-    Column <|
-        ColumnDefn name (textDetails << viewData) sorter
+    Column <| ColumnDefn name (viewData >> textDetails) sorter
 
 
 {-| It is *possible* that you want something crazier than `customColumn`. In
@@ -454,31 +447,32 @@ that.
 
 -}
 view : Config data msg -> State -> List data -> Html msg
-view (Config { toId, toMsg, columns, customizations }) state data =
+view (Config { toId, toMsg, columns, uiDef }) state data =
     let
         sortedData =
-            sort state columns data
+            data |> sort state columns
 
         theadDetails =
-            customizations.thead (List.map (toHeaderInfo state toMsg) columns)
+            columns |> List.map (toHeaderInfo state toMsg) |> uiDef.thead
 
         thead =
-            Html.thead theadDetails.attributes theadDetails.children
+            theadDetails.children |> Html.thead theadDetails.attributes
 
         tbody =
-            Keyed.node "tbody" customizations.tbodyAttrs <|
-                List.map (viewRow toId columns customizations.rowAttrs) sortedData
+            sortedData
+                |> List.map (viewRow toId columns uiDef.rowAttrs)
+                |> Keyed.node "tbody" uiDef.tbodyAttrs
 
         withFoot =
-            case customizations.tfoot of
+            case uiDef.tfoot of
                 Nothing ->
                     tbody :: []
 
                 Just { attributes, children } ->
                     Html.tfoot attributes children :: tbody :: []
     in
-        Html.table customizations.tableAttrs <|
-            case customizations.caption of
+        Html.table uiDef.tableAttrs <|
+            case uiDef.caption of
                 Nothing ->
                     thead :: withFoot
 
@@ -486,7 +480,7 @@ view (Config { toId, toMsg, columns, customizations }) state data =
                     Html.caption attributes children :: thead :: withFoot
 
 
-toHeaderInfo : State -> (State -> msg) -> ColumnDefn data msg -> ( String, Status, Attribute msg )
+toHeaderInfo : State -> (State -> msg) -> ColumnDefn data msg -> ( String, ColumnSortingStatus, Attribute msg )
 toHeaderInfo (State sortName direction) toMsg { name, sorter } =
     case sorter of
         None ->
@@ -601,16 +595,8 @@ applySorter direction sorter data =
 
 
 findSorter : String -> List (ColumnDefn data msg) -> Maybe (Sorter data)
-findSorter selectedColumn columnDefn =
-    case columnDefn of
-        [] ->
-            Nothing
-
-        { name, sorter } :: remainingColumnData ->
-            if name == selectedColumn then
-                Just sorter
-            else
-                findSorter selectedColumn remainingColumnData
+findSorter selectedColumn columnDefns =
+    columnDefns |> List.filter (\def -> def.name == selectedColumn) |> List.map .sorter |> List.head
 
 
 
