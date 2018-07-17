@@ -77,7 +77,7 @@ view : Model -> Html Msg
 view { sights, tableState } =
     div []
         [ bulma
-        , section []
+        , section [ class "section" ]
             [ div [ class "container" ]
                 [ div [ class "columns is-centered" ]
                     [ div [ class "column is-desktop is-half" ]
