@@ -12,7 +12,7 @@ This library also lets you customize `<caption>`, `<tbody>`, `<tr>`, etc. for yo
 
 ## Examples
 
-  1. [U.S. Presidents by Birth Place](https://evancz.github.io/elm-sortable-table/presidents.html) / [Code](https://github.com/evancz/elm-sortable-table/blob/master/examples/1-presidents.elm)
+  1. [U.S. Presidents by Birth Place](https://rawgit.com/martinos/elm-sortable-table/master/examples/1-presidents.html) / [Code](examples/1-presidents.elm)
   2. [Travel Planner for the Mission District in San Francisco](https://evancz.github.io/elm-sortable-table/travel.html) / [Code](https://github.com/evancz/elm-sortable-table/blob/master/examples/2-travel.elm)
 
 
