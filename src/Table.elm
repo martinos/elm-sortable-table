@@ -231,20 +231,20 @@ defaultUIDef : UIDef data msg
 defaultUIDef =
     { tableAttrs = []
     , caption = Nothing
-    , thead = simpleThead
+    , thead = simpleHeaders
     , tfoot = Nothing
     , tbodyAttrs = []
     , rowAttrs = simpleRowAttrs
     }
 
 
-simpleThead : List ( String, ColumnSortingStatus, Attribute msg ) -> HtmlDetails msg
-simpleThead headers =
-    HtmlDetails [] [ Html.tr [] (List.map simpleTheadHelp headers) ]
+simpleHeaders : List ( String, ColumnSortingStatus, Attribute msg ) -> HtmlDetails msg
+simpleHeaders headers =
+    HtmlDetails [] [ Html.tr [] (headers |> List.map simpleHeader) ]
 
 
-simpleTheadHelp : ( String, ColumnSortingStatus, Attribute msg ) -> Html msg
-simpleTheadHelp ( name, status, onClick ) =
+simpleHeader : ( String, ColumnSortingStatus, Attribute msg ) -> Html msg
+simpleHeader ( name, status, onClick ) =
     let
         content =
             case status of
