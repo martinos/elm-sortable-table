@@ -1,7 +1,7 @@
 module Main exposing (..)
 
-import Html exposing (Html, Attribute, div, h1, input, p, text)
-import Html.Attributes exposing (checked, style, type_)
+import Html exposing (Html, Attribute, div, h1, input, p, text, node, section)
+import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Html.Lazy exposing (lazy)
 import Table exposing (defaultUIDef)
@@ -76,9 +76,20 @@ toggle name sight =
 view : Model -> Html Msg
 view { sights, tableState } =
     div []
-        [ h1 [] [ text "Trip Planner" ]
-        , lazy viewSummary sights
-        , Table.view config tableState sights
+        [ bulma
+        , section []
+            [ div [ class "container" ]
+                [ div [ class "columns is-centered" ]
+                    [ div [ class "column is-desktop is-half" ]
+                        [ h1 [ class "title" ] [ text "Trip Planner" ]
+                        , div [ class "columns" ]
+                            [ div [ class "column" ] [ lazy viewSummary sights ] ]
+                        , div [ class "columns" ]
+                            [ div [ class "column" ] [ Table.view config tableState sights ] ]
+                        ]
+                    ]
+                ]
+            ]
         ]
 
 
@@ -147,7 +158,7 @@ config =
             , Table.floatColumn "Rating" .rating
             ]
         , uiDef =
-            { defaultUIDef | rowAttrs = toRowAttrs }
+            { defaultUIDef | rowAttrs = toRowAttrs, tableAttrs = [ class "table" ] }
         }
 
 
@@ -214,3 +225,10 @@ missionSights =
     , Sight "Buy a painting at \"Stuff\"" (45 * Time.minute) 400 4.7 False
     , Sight "McDonalds at 24th" (20 * Time.minute) 5 2.8 False
     ]
+
+
+bulma =
+    div []
+        [ node "meta" [ name "viewport", content "width=device-width, initial-scale=1" ] []
+        , node "link" [ rel "stylesheet", href "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css" ] []
+        ]

@@ -9169,6 +9169,42 @@ var _user$project$Table$increasingBy = function (toComparable) {
 };
 var _user$project$Table$None = {ctor: 'None'};
 var _user$project$Table$unsortable = _user$project$Table$None;
+var _user$project$Main$bulma = A2(
+	_elm_lang$html$Html$div,
+	{ctor: '[]'},
+	{
+		ctor: '::',
+		_0: A3(
+			_elm_lang$html$Html$node,
+			'meta',
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$name('viewport'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$content('width=device-width, initial-scale=1'),
+					_1: {ctor: '[]'}
+				}
+			},
+			{ctor: '[]'}),
+		_1: {
+			ctor: '::',
+			_0: A3(
+				_elm_lang$html$Html$node,
+				'link',
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$rel('stylesheet'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$href('https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css'),
+						_1: {ctor: '[]'}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {ctor: '[]'}
+		}
+	});
 var _user$project$Main$viewCheckbox = function (_p0) {
 	var _p1 = _p0;
 	return A2(
@@ -9449,7 +9485,14 @@ var _user$project$Main$config = _user$project$Table$customConfig(
 		},
 		uiDef: _elm_lang$core$Native_Utils.update(
 			_user$project$Table$defaultUIDef,
-			{rowAttrs: _user$project$Main$toRowAttrs})
+			{
+				rowAttrs: _user$project$Main$toRowAttrs,
+				tableAttrs: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('table'),
+					_1: {ctor: '[]'}
+				}
+			})
 	});
 var _user$project$Main$view = function (_p8) {
 	var _p9 = _p8;
@@ -9459,22 +9502,114 @@ var _user$project$Main$view = function (_p8) {
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$h1,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Trip Planner'),
-					_1: {ctor: '[]'}
-				}),
+			_0: _user$project$Main$bulma,
 			_1: {
 				ctor: '::',
-				_0: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Main$viewSummary, _p10),
-				_1: {
-					ctor: '::',
-					_0: A3(_user$project$Table$view, _user$project$Main$config, _p9.tableState, _p10),
-					_1: {ctor: '[]'}
-				}
+				_0: A2(
+					_elm_lang$html$Html$section,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('container'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('columns is-centered'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('column is-desktop is-half'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$h1,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('title'),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Trip Planner'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$div,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('columns'),
+															_1: {ctor: '[]'}
+														},
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$div,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$class('column'),
+																	_1: {ctor: '[]'}
+																},
+																{
+																	ctor: '::',
+																	_0: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Main$viewSummary, _p10),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$div,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('columns'),
+																_1: {ctor: '[]'}
+															},
+															{
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$div,
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$class('column'),
+																		_1: {ctor: '[]'}
+																	},
+																	{
+																		ctor: '::',
+																		_0: A3(_user$project$Table$view, _user$project$Main$config, _p9.tableState, _p10),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}
+												}
+											}),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
 			}
 		});
 };
