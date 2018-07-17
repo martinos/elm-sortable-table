@@ -12,8 +12,8 @@ This library also lets you customize `<caption>`, `<tbody>`, `<tr>`, etc. for yo
 
 ## Examples
 
-  1. [U.S. Presidents by Birth Place](https://rawgit.com/martinos/elm-sortable-table/master/examples/1-presidents.html) / [Code](examples/1-presidents.elm)
-  2. [Travel Planner for the Mission District in San Francisco](https://rawgit.com/martinos/elm-sortable-table/master/examples/2-travel.html) / [Code](examples/2-travel.elm)
+  1. [U.S. Presidents by Birth Place](https://rawgit.com/martinos/elm-sortable-table/master/examples/1-presidents.html) / [Code](https://github.com/martinos/elm-sortable-table/blob/master/examples/1-presidents.elm)
+  2. [Travel Planner for the Mission District in San Francisco](https://rawgit.com/martinos/elm-sortable-table/master/examples/2-travel.html) / [Code](https://github.com/martinos/elm-sortable-table/blob/master/examples/2-travel.elm)
 
 
 ## Usage Rules
