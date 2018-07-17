@@ -238,12 +238,12 @@ defaultUIDef =
     }
 
 
-simpleHeaders : List ( String, ColumnSortingStatus, Attribute msg ) -> HtmlDetails msg
+simpleHeaders : List (HeaderInfo msg) -> HtmlDetails msg
 simpleHeaders headers =
     HtmlDetails [] [ Html.tr [] (headers |> List.map simpleHeader) ]
 
 
-simpleHeader : ( String, ColumnSortingStatus, Attribute msg ) -> Html msg
+simpleHeader : HeaderInfo msg -> Html msg
 simpleHeader ( name, status, onClick ) =
     let
         content =
@@ -480,7 +480,11 @@ view (Config { toId, toMsg, columns, uiDef }) state data =
                     Html.caption attributes children :: thead :: withFoot
 
 
-toHeaderInfo : State -> (State -> msg) -> ColumnDefn data msg -> ( String, ColumnSortingStatus, Attribute msg )
+type alias HeaderInfo msg =
+    ( String, ColumnSortingStatus, Attribute msg )
+
+
+toHeaderInfo : State -> (State -> msg) -> ColumnDefn data msg -> HeaderInfo msg
 toHeaderInfo (State sortName direction) toMsg { name, sorter } =
     case sorter of
         None ->
@@ -539,7 +543,7 @@ viewRow toId columns toRowAttrs data =
 
 viewRowHelp : List (ColumnDefn data msg) -> (data -> List (Attribute msg)) -> data -> Html msg
 viewRowHelp columns toRowAttrs data =
-    Html.tr (toRowAttrs data) (List.map (viewCell data) columns)
+    Html.tr (toRowAttrs data) (columns |> List.map (viewCell data))
 
 
 viewCell : data -> ColumnDefn data msg -> Html msg
