@@ -4,7 +4,7 @@ import Html exposing (Html, Attribute, div, h1, input, p, text)
 import Html.Attributes exposing (checked, style, type_)
 import Html.Events exposing (onClick)
 import Html.Lazy exposing (lazy)
-import Table exposing (defaultCustomizations)
+import Table exposing (defaultUIDef)
 import Time exposing (Time)
 
 
@@ -146,8 +146,8 @@ config =
             , Table.floatColumn "Price" .price
             , Table.floatColumn "Rating" .rating
             ]
-        , customizations =
-            { defaultCustomizations | rowAttrs = toRowAttrs }
+        , uiDef =
+            { defaultUIDef | rowAttrs = toRowAttrs }
         }
 
 
