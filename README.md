@@ -2,8 +2,7 @@
 
 ## NOTE: This is a fork of evancz/elm-sortable-table. The original package does not seem to be maintained anymore.
 
-## I have fixed an important [issue](https://github.com/evancz/elm-sortable-table/issues/15).
-## I've also added new types and rename some others, it was mainly to help me to better understand how to package works
+### I have fixed an important [issue](https://github.com/evancz/elm-sortable-table/issues/15). I've also added new types and renamed some others, it was mainly to help me better understand how the package works.
 
 
 Create sortable tables for data of any shape.
